@@ -9,7 +9,7 @@
 <meta name="theme-color" content="#0b6e4f">
 <script>
 // إعدادات قاعدة البيانات السحابية (Supabase): ضع هنا رابط المشروع ومفتاح anon العام فقط. لا تضع مفتاح service_role أبدًا.
-const CLOUD_URL="",CLOUD_KEY="";
+// Local-only mode: no cloud sync. Data stays in this browser and can be exported to Excel.
 </script>
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -50,39 +50,18 @@ h3{font-size:.95rem;margin:12px 0 4px}
 .fs{border:1px solid var(--bd);border-radius:10px;padding:8px 10px;margin:8px 0}.fs legend{color:var(--ac);font-size:.9rem;padding:0 6px}
 </style>
 </head>
-<body><div class="w">
+<body><div id="loginGate" style="max-width:520px;margin:8vh auto;padding:20px;background:var(--card);border:1px solid var(--bd);border-radius:16px"><h1 style="text-align:center;color:var(--ac)">The Faster — دخول المسؤول</h1><p class="n">في أول استخدام أنشئ كلمة مرور للمسؤول. لا توجد مزامنة سحابية؛ البيانات محفوظة في هذا المتصفح فقط.</p><label>كلمة مرور المسؤول<input id="adminPassword" type="password" autocomplete="current-password" minlength="8" placeholder="8 أحرف على الأقل"></label><button id="adminAccessButton" onclick="adminAccess()" style="width:100%;margin-top:12px">دخول لوحة التحكم</button><p id="loginStatus" class="n"></p><p class="n">هذا قفل محلي وليس نظام مصادقة آمنًا على خادم؛ لا تستخدمه لحماية بيانات شديدة الحساسية أو على جهاز مشترك.</p></div><div id="appShell" style="display:none"><div class="w">
 <div style="position:relative;border-radius:14px;overflow:hidden;margin-bottom:8px"><img src="hero.jpg" alt="متسابقو 100م" style="width:100%;height:auto;display:block;max-height:230px;object-fit:cover;object-position:center 60%"><div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.78),rgba(0,0,0,.05) 70%);display:flex;flex-direction:column;justify-content:flex-end;padding:14px;color:#fff"><h1 style="margin:0;direction:ltr;text-align:right;font-size:1.8rem">The Faster</h1></div></div>
-<p class="n">أداة مساعدة تعتمد على معادلات وقواعد تدريبية مبسطة. النتائج تقديرية وتحتاج مراجعة مدرب مختص أو محكمين قبل التطبيق.</p>
+<p class="n">أداة مساعدة تعتمد على معادلات وقواعد تدريبية مبسطة. النتائج تقديرية وتحتاج مراجعة مدرب مختص أو محكمين قبل التطبيق.</p><div class="card" style="border-right:4px solid var(--wa)"><h2>البصمة البدنية الرقمية DPF</h2><p class="n">تجمع المنصة القياسات الأنثروبومترية والبدنية والوظيفية والمهارية لمتابعة تطور اللاعب. الملاءمة الحالية استرشادية وليست احتمالًا إحصائيًا مثبتًا. لا تعتمد على درجة من 100 كمعيار علمي ما لم يكن لها مصدر موثق مناسب للعمر والجنس وبروتوكول الاختبار. عند غياب معيار موثق، اعتمد على النتيجة الخام واتجاه التغير عبر الزمن.</p></div>
 
-<div class="card"><h2>المزامنة السحابية</h2>
-<p class="n">سجّل الدخول بنفس الحساب على كل الأجهزة لتتزامن بيانات اللاعبين تلقائيًا. تعمل الأداة دون إنترنت وتزامن عند عودة الاتصال.</p>
-<div class="g"><label>البريد الإلكتروني (المدرب) أو الرقم القومي (اللاعب)<input id="ce" autocomplete="username"></label>
-<label>كلمة المرور<input id="cp" type="password" autocomplete="current-password"></label></div>
-<button onclick="login(false)">تسجيل الدخول</button>
-<button class="s" onclick="sync()">مزامنة الآن</button>
-<button class="s" onclick="logout()">تسجيل الخروج</button>
-<p class="n" id="cs"></p></div>
-<div class="card" id="actc"><h2>تفعيل حساب لاعب</h2>
-<p class="n">للاعب: أدخل رقمك القومي وكود التفعيل الذي سلّمه لك المدرب، واختر كلمة مرور خاصة بك. بعدها سجّل الدخول برقمك القومي وكلمة المرور.</p>
-<div class="g"><label>الرقم القومي<input id="an" inputmode="numeric" maxlength="14"></label>
-<label>كود التفعيل<input id="ac" autocomplete="off"></label>
-<label>كلمة المرور الجديدة (8 أحرف فأكثر)<input id="ap" type="password" autocomplete="new-password"></label></div>
-<button onclick="activate()">تفعيل الحساب</button></div>
-<div class="card admo" style="display:none"><h2>إدارة اللاعبين وحساباتهم (للمسؤول)</h2>
-<div class="g"><label>اسم اللاعب<input id="rn"></label>
-<label>الرقم القومي (14 رقمًا)<input id="rnid" inputmode="numeric" maxlength="14"></label></div>
-<button onclick="addR()">إضافة لاعب وتوليد كود التفعيل</button>
-<button class="s" onclick="listR()">تحديث القائمة</button>
-<p class="n">سلّم كل لاعب كود تفعيله، فيستخدمه مع رقمه القومي لإنشاء كلمة مروره بنفسه. لا يُحفظ الرقم القومي نفسه في قاعدة البيانات بل بصمة مشفّرة منه.</p>
-<div class="t" id="rl"></div></div>
-<div class="card"><h2>سجل اللاعبين</h2>
+<div class="card"><h2>سجل اللاعبين</h2><button class="s" onclick="logout()">تسجيل الخروج من لوحة التحكم</button>
 <div class="g">
 <label class="adm">اسم اللاعب<input id="pn" type="text" placeholder="مثال: أحمد محمد"></label>
 <label>اللاعبون المحفوظون<select id="pl_sel" onchange="loadP()"></select></label>
 </div>
 <button class="adm" onclick="saveT()">حفظ نتيجة الاختبار الحالي</button>
 <button class="s adm" onclick="delP()">حذف اللاعب</button>
-<button class="s adm" onclick="bk()">نسخة احتياطية</button>
+<button class="s adm" onclick="bk()">نسخة احتياطية JSON</button><button class="s adm" onclick="exportExcel()">تنزيل ملف Excel</button>
 <button class="s adm" onclick="$('imp').click()">استيراد نسخة</button>
 <input id="imp" type="file" accept=".json" style="display:none" onchange="imp(event)">
 <button class="s" id="ib" onclick="inst()" style="display:none">تثبيت التطبيق</button>
@@ -90,7 +69,7 @@ h3{font-size:.95rem;margin:12px 0 4px}
 <h2 style="margin-top:14px">رسم تطور اللاعب عبر الاختبارات</h2><p class="n">يعرض تطور درجات اختبارات الانتقاء ونتائجها الخام من اختبار لآخر. اختر اللاعب من القائمة أعلاه ثم المتغير.</p>
 <label>المتغير<select id="cm_sel" onchange="chart()"></select></label>
 <div id="ch" style="margin-top:8px"></div>
-<p class="n">تُحفظ البيانات على هذا الجهاز وفي هذا المتصفح فقط، وقد تُمسح إذا حُذفت بيانات المتصفح أو التطبيق، فخذ نسخة احتياطية بانتظام.</p></div>
+<p class="n">البيانات محفوظة على هذا الجهاز وفي هذا المتصفح فقط. نزّل نسخة Excel بانتظام واحتفظ بها بأمان؛ لن تنتقل تلقائيًا إلى جهاز آخر.</p></div>
 <div class="card adm"><h2>اختبارات الانتقاء: بيانات لاعب</h2>
 <div class="g"><label>اسم اللاعب<input id="s_name" list="dl" placeholder="اسم اللاعب"></label><label>تاريخ الاختبار<input id="s_date" type="date"></label><label>النوع<select id="s_sx"><option value="m">ذكر</option><option value="f">أنثى</option></select></label></div>
 <datalist id="dl"></datalist>
@@ -115,7 +94,7 @@ h3{font-size:.95rem;margin:12px 0 4px}
 <div class="card adm"><h2>مقارنة نتائج اختبارات اللاعبين</h2>
 <p class="n">تُقارن آخر اختبارات انتقاء محفوظة لكل لاعب، وتُرتَّب بمتوسط درجات الاختبارات الست.</p>
 <button onclick="cmpAll()">تحديث المقارنة</button><div id="cmp_out" class="t" style="margin-top:8px"></div></div>
-<div class="card adm"><h2>المعطيات</h2>
+<div class="card adm"><h2>لوحة التحكم الرقمية العامة</h2><div class="k" id="dashboardKpis"><div class="kp"><b>0</b><span>لاعبون</span></div><div class="kp"><b>0</b><span>اختبارات</span></div></div><p class="n">المؤشرات من البيانات المحفوظة محليًا. يمكن تصدير ملخص اللاعبين وسجل الاختبارات إلى Excel.</p><button onclick="exportExcel()">تنزيل لوحة البيانات بصيغة Excel</button></div><div class="card adm"><h2>المعطيات</h2>
 <div class="g">
 <label>الطول (سم)<input id="h" type="number"></label>
 <label>الوزن (كجم)<input id="w" type="number"></label>
@@ -258,7 +237,7 @@ function hist(n){const r=(ld()[n]||[]).filter(x=>!(x.in&&x.in.kind));if(!r.lengt
 $('hs').innerHTML='<table><tr><th>التاريخ</th><th>30م</th><th>50م طائر</th><th>الرقم 100م</th><th>الوثب</th><th>طول الخطوة</th><th>زمن الخطوة</th><th>الزمن المتوقع</th><th>التغير</th></tr>'+r.map((x,i)=>{const dl=i?x.m.T-r[i-1].m.T:null;return `<tr><td>${E(x.date)}</td><td>${E(x.in.t30)}</td><td>${E(x.in.t50)}</td><td>${E(x.in.pb)}</td><td>${E(x.in.slj)}</td><td>${Number(x.m.SL).toFixed(2)}</td><td>${Number(x.m.ST).toFixed(3)}</td><td>${Number(x.m.T).toFixed(2)}</td><td>${dl===null?'—':(dl<=0?'تحسن ':'تراجع ')+Math.abs(dl).toFixed(2)+' ث'}</td></tr>`}).join('')+'</table>'}
 function saveT(){const n=$('pn').value.trim();if(!n){alert('اكتب اسم اللاعب أولًا');return}
 LAST=null;run();if(!LAST)return;const o=ld(),r={date:new Date().toISOString().slice(0,10),in:{},m:LAST};
-IDS.forEach(i=>r.in[i]=$(i).value);(o[n]=o[n]||[]).push(r);if(sv(o)){plist(n);hist(n);sync()}}
+IDS.forEach(i=>r.in[i]=$(i).value);(o[n]=o[n]||[]).push(r);if(sv(o)){plist(n);hist(n);updateDashboard()}}
 function loadP(){const n=$('pl_sel').value;if(!n){$('hs').innerHTML='';return}const r=(ld()[n]||[]).filter(x=>!(x.in&&x.in.kind)).slice(-1)[0];$('pn').value=n;if(r)IDS.forEach(i=>{if(r.in[i]!==undefined)$(i).value=r.in[i]});hist(n)}
 async function delP(){const n=$('pl_sel').value;if(!n){alert('اختر لاعبًا أولًا');return}if(!confirm('حذف اللاعب وكل اختباراته؟'))return;
 if(cfg().at){try{await req('tests?player=eq.'+encodeURIComponent(n),{method:'DELETE'})}catch(e){alert('تعذر الحذف من السحابة ('+e.message+'). تأكد من الاتصال ثم أعد المحاولة.');return}}
@@ -285,49 +264,28 @@ let g='';for(let k=0;k<=4;k++){const q=lo+(hi-lo)*k/4,y=Y(q);g+=`<line x1="${L}"
 const dots=v.map((q,i)=>`<circle cx="${X(i)}" cy="${Y(q)}" r="4.5" fill="var(--ac)"/><text x="${X(i)}" y="${Y(q)-9}" font-size="11" text-anchor="middle" fill="var(--tx)">${q.toFixed(2)}</text>`+(i%step==0||i==v.length-1?`<text x="${X(i)}" y="${H-14}" font-size="10" text-anchor="middle" fill="var(--mu)">${E(pts[i].d)}</text>`:'')).join('');
 let note='';if(v.length>1){const d=v[v.length-1]-v[0],good=m[3]?d<0:d>0;note=`<p class="n">التغير من أول اختبار إلى آخر اختبار: ${d>0?'+':''}${d.toFixed(2)} (${d==0?'ثابت':good?'تحسن':'تراجع'}). ${m[3]?'الانخفاض في هذا المتغير يعني تحسنًا.':''}</p>`}else note='<p class="n">احفظ اختبارين على الأقل لرؤية خط التطور.</p>';
 box.innerHTML=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;direction:ltr" role="img" aria-label="${E(m[1])}">${g}<polyline points="${v.map((q,i)=>X(i)+','+Y(q)).join(' ')}" fill="none" stroke="var(--ac)" stroke-width="2.5"/>${dots}</svg>`+note}
-function cfg(){try{return JSON.parse(localStorage.getItem('sprintCloud'))||{}}catch(e){return{}}}
-function scfg(o){try{localStorage.setItem('sprintCloud',JSON.stringify(o))}catch(e){}}
-function st(t){$('cs').textContent=t}
-async function auth(path,body){const r=await fetch(CLOUD_URL+'/auth/v1/'+path,{method:'POST',headers:{apikey:CLOUD_KEY,'Content-Type':'application/json'},body:JSON.stringify(body)});const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error_description||j.msg||j.message||('خطأ '+r.status));return j}
-const PDOM='players.thefaster.app';
-async function pemail(id){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(id));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('').slice(0,40)+'@'+PDOM}
-async function rpcAs(at,fn,body){const r=await fetch(CLOUD_URL+'/rest/v1/rpc/'+fn,{method:'POST',headers:{apikey:CLOUD_KEY,Authorization:'Bearer '+at,'Content-Type':'application/json'},body:JSON.stringify(body)});if(!r.ok)throw new Error('خطأ '+r.status);return r.json()}
-async function fin(em,j,r,p){if(r==='player'&&Object.keys(ld()).length&&!confirm('سيتم استبدال البيانات المحلية على هذا الجهاز ببياناتك فقط. متابعة؟')){st('أُلغي تسجيل الدخول');return}
-scfg({email:em,at:j.access_token,rt:j.refresh_token,role:r,player:p||''});$('cp').value='';$('ap').value='';applyRole();st('تم تسجيل الدخول');await sync()}
-async function login(){if(!CLOUD_URL||!CLOUD_KEY){st('لم تُضبط قاعدة البيانات بعد: عدّل CLOUD_URL و CLOUD_KEY في الملف');return}
-const id=$('ce').value.trim(),pw=$('cp').value;if(!id||pw.length<6){st('أدخل البريد أو الرقم القومي وكلمة المرور');return}
-try{const em=/^\d{14}$/.test(id)?await pemail(id):id,j=await auth('token?grant_type=password',{email:em,password:pw}),r=await rpcAs(j.access_token,'my_role',{});
-if(!r){st('هذا الحساب غير مُفعَّل كمسؤول أو لاعب. تواصل مع المدرب');return}await fin(em,j,r.role,r.player)}catch(e){st('تعذر: '+e.message)}}
-async function activate(){if(!CLOUD_URL||!CLOUD_KEY){st('لم تُضبط قاعدة البيانات بعد');return}
-const id=$('an').value.trim(),c=$('ac').value.trim().toUpperCase(),pw=$('ap').value;if(!/^\d{14}$/.test(id)||!c||pw.length<8){st('أدخل رقمًا قوميًا من 14 رقمًا وكود التفعيل وكلمة مرور من 8 أحرف على الأقل');return}
-try{const em=await pemail(id);try{await auth('signup',{email:em,password:pw})}catch(e){}
-const j=await auth('token?grant_type=password',{email:em,password:pw}),p=await rpcAs(j.access_token,'claim_player',{p_nid:id,p_code:c});
-if(!p){st('الرقم القومي أو الكود غير صحيح، أو الحساب مفعّل مسبقًا');return}await fin(em,j,'player',p)}catch(e){st('تعذر التفعيل: '+e.message)}}
-function applyRole(){const c=cfg(),r=c.role;document.querySelectorAll('.adm').forEach(e=>e.style.display=r==='player'?'none':'');document.querySelectorAll('.admo').forEach(e=>e.style.display=r==='admin'?'':'none');
-const a=$('actc');if(a)a.style.display=c.at?'none':'';if(r==='admin'&&navigator.onLine)listR();if(r==='player'&&c.player){plist(c.player);hist(c.player);selAuto()}}
-async function addR(){const n=$('rn').value.trim(),id=$('rnid').value.trim();if(!n||!/^\d{14}$/.test(id)){alert('اكتب الاسم ورقمًا قوميًا من 14 رقمًا');return}
-try{const c=await(await req('rpc/add_player',{method:'POST',body:JSON.stringify({p_name:n,p_nid:id})})).json();$('rn').value='';$('rnid').value='';alert('كود تفعيل '+n+': '+c+'\nسلّمه للاعب ولا تشاركه مع غيره');listR()}catch(e){alert('تعذرت الإضافة (قد يكون الاسم أو الرقم مكررًا): '+e.message)}}
-async function listR(){try{const r=await(await req('roster?select=player,code,user_id,attempts&order=player')).json();
-$('rl').innerHTML='<table><tr><th>اللاعب</th><th>الحالة</th><th>كود التفعيل</th><th></th></tr>'+r.map(x=>`<tr><td>${E(x.player)}</td><td>${x.user_id?'مفعّل':'بانتظار التفعيل'+(x.attempts>=5?' (مقفل بعد محاولات خاطئة)':'')}</td><td>${x.user_id?'—':E(x.code)}</td><td><button class="s" data-p="${E(x.player)}" onclick="delR(this.dataset.p)">حذف</button></td></tr>`).join('')+'</table>'}catch(e){$('rl').textContent='تعذر تحميل القائمة: '+e.message}}
-async function delR(p){if(!confirm('حذف اللاعب من القائمة؟ سيفقد حسابه الوصول إلى بياناته.'))return;try{await req('roster?player=eq.'+encodeURIComponent(p),{method:'DELETE'});listR()}catch(e){alert(e.message)}}
-async function pullP(){const rows=await(await req('tests?select=rid,player,data')).json(),o={};rows.forEach(w=>(o[w.player]=o[w.player]||[]).push({...w.data,rid:w.rid}));
-for(const n in o)o[n].sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:0);sv(o);plist(cfg().player);if(cfg().player){hist(cfg().player);selAuto()}}
-function logout(){const pl=cfg().role==='player';scfg({});if(pl){try{localStorage.removeItem(SK_)}catch(e){}plist();$('hs').innerHTML='';chart();$('sel_res').innerHTML='';$('sel_plan').innerHTML='';$('sel_h').innerHTML='';SEL=null}applyRole();st(pl?'تم تسجيل الخروج ومسح بياناتك من هذا الجهاز':'تم تسجيل الخروج (البيانات المحلية باقية على الجهاز)')}
-async function req(path,opt={},retry=true){const c=cfg();if(!CLOUD_URL||!c.at)throw new Error('سجّل الدخول أولًا');
-const r=await fetch(CLOUD_URL+'/rest/v1/'+path,{...opt,headers:{apikey:CLOUD_KEY,Authorization:'Bearer '+c.at,'Content-Type':'application/json',...(opt.headers||{})}});
-if(r.status===401&&retry&&c.rt){const j=await auth('token?grant_type=refresh_token',{refresh_token:c.rt});scfg({...c,at:j.access_token,rt:j.refresh_token});return req(path,opt,false)}
-if(!r.ok)throw new Error('خطأ '+r.status);return r}
-let syncing=false;
-async function sync(){if(syncing||!CLOUD_URL||!cfg().at||!navigator.onLine)return;syncing=true;
-try{st('جارٍ المزامنة...');if(cfg().role==='player'){await pullP();st('تم تحديث بياناتك '+new Date().toLocaleTimeString('ar-EG'));return}const o=ld();
-for(const n in o)o[n].forEach(x=>{if(!x.rid)x.rid=(crypto.randomUUID?crypto.randomUUID():Date.now()+'-'+Math.random().toString(36).slice(2))});
-const rows=await(await req('tests?select=rid,player,data')).json(),have=new Set(Object.values(o).flat().map(x=>x.rid)),cl=new Set(rows.map(x=>x.rid));
-rows.forEach(w=>{if(!have.has(w.rid))(o[w.player]=o[w.player]||[]).push({...w.data,rid:w.rid})});
-const up=[];for(const n in o)o[n].forEach(x=>{if(!cl.has(x.rid))up.push({rid:x.rid,player:n,data:{date:x.date,in:x.in,m:x.m}})});
-if(up.length)await req('tests?on_conflict=user_id,rid',{method:'POST',headers:{Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify(up)});
-for(const n in o)o[n].sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:0);
-sv(o);const cur=$('pl_sel').value;plist(cur);if(cur)hist(cur);st('تمت المزامنة '+new Date().toLocaleTimeString('ar-EG')+' (رُفع '+up.length+' وسُحب '+(rows.filter(w=>!have.has(w.rid)).length)+')')}
-catch(e){st('تعذرت المزامنة: '+e.message)}finally{syncing=false}}
+function cfg(){return {role:sessionStorage.getItem('theFasterAdminSession')==='1'?'admin':null};}
+function scfg(o){}
+function st(t){const el=$('localStatus')||$('loginStatus')||$('cs');if(el)el.textContent=t}
+async function hashPassword(p){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(p));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
+async function adminAccess(){const p=$('adminPassword').value,saved=localStorage.getItem('theFasterAdminHash'),status=$('loginStatus');if(p.length<8){status.textContent='كلمة المرور يجب ألا تقل عن 8 أحرف.';return}const h=await hashPassword(p);if(!saved){if(!confirm('سيتم إنشاء كلمة مرور المسؤول على هذا المتصفح فقط. متابعة؟'))return;localStorage.setItem('theFasterAdminHash',h)}else if(h!==saved){status.textContent='كلمة المرور غير صحيحة.';return}sessionStorage.setItem('theFasterAdminSession','1');$('adminPassword').value='';$('loginGate').style.display='none';$('appShell').style.display='block';applyRole();plist();chart();initSel();updateDashboard();st('تم الدخول إلى لوحة التحكم المحلية')}
+function applyRole(){document.querySelectorAll('.adm').forEach(e=>e.style.display='');document.querySelectorAll('.admo').forEach(e=>e.style.display='none');updateDashboard()}
+function logout(){sessionStorage.removeItem('theFasterAdminSession');$('appShell').style.display='none';$('loginGate').style.display='block';$('loginStatus').textContent='تم تسجيل الخروج. البيانات المحفوظة لم تُحذف.'}
+function sync(){st('المزامنة السحابية معطّلة. استخدم تنزيل ملف Excel أو النسخة الاحتياطية JSON.')}
+function updateDashboard(){const el=$('dashboardKpis');if(!el)return;const o=ld(),names=Object.keys(o).filter(n=>n.slice(0,2)!=='__'),records=names.flatMap(n=>(o[n]||[])),sel=records.filter(x=>x.in&&x.in.kind==='sel');el.innerHTML='<div class="kp"><b>'+names.length+'</b><span>لاعبون مسجلون</span></div><div class="kp"><b>'+records.length+'</b><span>اختبارات محفوظة</span></div><div class="kp"><b>'+sel.length+'</b><span>اختبارات انتقاء</span></div><div class="kp"><b>'+new Set(records.map(x=>x.date).filter(Boolean)).size+'</b><span>أيام اختبار مسجلة</span></div>}
+function exportExcel(){
+const o=ld(),names=Object.keys(o).filter(n=>n.slice(0,2)!=='__'),records=names.flatMap(n=>(o[n]||[]).map(x=>({name:n,...x})));
+const esc=v=>String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;');
+const cell=v=>typeof v==='number'&&isFinite(v)?'<Cell><Data ss:Type="Number">'+v+'</Data></Cell>':'<Cell><Data ss:Type="String">'+esc(v)+'</Data></Cell>';
+const sheet=(name,rows)=>'<Worksheet ss:Name="'+esc(name)+'"><Table>'+rows.map(row=>'<Row>'+row.map(cell).join('')+'</Row>').join('')+'</Table></Worksheet>';
+const summary=[['اسم اللاعب','عدد الاختبارات','اختبارات الانتقاء','آخر تاريخ اختبار','آخر مسابقة مقترحة','ملاءمة تقديرية (%)']];
+names.forEach(n=>{const a=o[n]||[],s=a.filter(x=>x.in&&x.in.kind==='sel'&&x.m&&Array.isArray(x.m.ev)).sort((x,y)=>String(y.date).localeCompare(String(x.date))),last=s[0],ev=last&&last.m.ev[0];summary.push([n,a.length,s.length,a.map(x=>x.date||'').sort().slice(-1)[0]||'',ev?({'s100':'100م عدو','s200':'200م عدو','s400':'400م عدو','jmp':'الوثب','thr':'الرمي'})[ev[0]]||ev[0]:'',ev?Number(ev[1]):''])});
+const detail=[['اسم اللاعب','التاريخ','نوع السجل','العمر','العمر التدريبي','النوع','الطول سم','الوزن كجم','كوبر م','30م ث','50م طائر ث','وثب عريض م','وثب عمودي سم','رمي كرة طبية م','مرونة سم','طول الرجل سم','وصول يمين سم','وصول يسار سم','VO2max تقديري','المسابقة الأولى','ملاءمة تقديرية %','بيانات الإدخال JSON','النتائج JSON']];
+records.forEach(q=>{const i=q.in||{},m=q.m||{},ev=m.ev&&m.ev[0],evname=ev?({'s100':'100م عدو','s200':'200م عدو','s400':'400م عدو','jmp':'الوثب','thr':'الرمي'})[ev[0]]||ev[0]:'';detail.push([q.name,q.date||'',i.kind==='sel'?'انتقاء':'اختبار أداء',i.age??'',i.ta??'',i.sx==='f'?'أنثى':i.sx==='m'?'ذكر':'',i.h??'',i.w??'',i.cooper??'',i.t30??i.s_t30??'',i.t50f??i.t50??'',i.slj??'',i.vj??'',i.mb??'',i.sr??'',i.ll??'',i.br??'',i.bl??'',m.X&&m.X.vo2!=null?Number(m.X.vo2):'',evname,ev?Number(ev[1]):'',JSON.stringify(i),JSON.stringify(m)])});
+const raw=[['اسم اللاعب','التاريخ','بيانات الإدخال JSON','النتائج JSON','معرّف السجل'],...records.map(q=>[q.name,q.date||'',JSON.stringify(q.in||{}),JSON.stringify(q.m||{}),q.rid||''])];
+const xml='<?xml version="1.0" encoding="UTF-8"?><?mso-application progid="Excel.Sheet"?><Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet" xmlns:html="http://www.w3.org/TR/REC-html40">'+sheet('ملخص اللاعبين',summary)+sheet('سجل الاختبارات',detail)+sheet('بيانات كاملة',raw)+'</Workbook>';
+const blob=new Blob(['\ufeff',xml],{type:'application/vnd.ms-excel;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='The_Faster_DPF_'+new Date().toISOString().slice(0,10)+'.xls';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);st('تم تجهيز ملف Excel للتنزيل')
+}
 const SEL_F=['age','ta','h','w','cooper','t30','t50f','slj','vj','mb','sr','ll','br','bl'];
 let SEL=null;
 function uid(){return crypto.randomUUID?crypto.randomUUID():Date.now()+'-'+Math.random().toString(36).slice(2)}
@@ -402,7 +360,7 @@ async function delSel(n,rid){if(!confirm('حذف هذا الاختبار؟'))ret
 const o=ld();o[n]=(o[n]||[]).filter(x=>x.rid!==rid);sv(o);selHist(n);chart();$('sel_res').innerHTML='<p class="n">تم الحذف.</p>';$('sel_plan').innerHTML=''}
 function analyzeSel(){const o=readSel(),c=calc(o);if(!c.ev.length){alert('أدخل بيانات كافية (السرعة والقدرة العضلية على الأقل مع الوزن والطول)');return}showSel({date:$('s_date').value||'',in:o,m:{Q:c.Q,g:c.g,ev:c.ev,X:c.X}},$('s_name').value.trim()||'لاعب (غير محفوظ)');$('selc').scrollIntoView({behavior:'smooth'})}
 function saveSel(){const nm=$('s_name').value.trim(),d=$('s_date').value;if(!nm){alert('اكتب اسم اللاعب');return}if(!d){alert('اختر تاريخ الاختبار');return}const o=readSel(),c=calc(o);if(!c.ev.length){alert('أدخل بيانات كافية (السرعة والقدرة العضلية على الأقل مع الوزن والطول)');return}
-const db=ld(),rec={rid:uid(),date:d,in:o,m:{Q:c.Q,g:c.g,ev:c.ev,X:c.X}};(db[nm]=db[nm]||[]).push(rec);if(sv(db)){plist(nm);hist(nm);showSel(rec,nm);selHist(nm);sync()}}
+const db=ld(),rec={rid:uid(),date:d,in:o,m:{Q:c.Q,g:c.g,ev:c.ev,X:c.X}};(db[nm]=db[nm]||[]).push(rec);if(sv(db)){plist(nm);hist(nm);showSel(rec,nm);selHist(nm);updateDashboard()}}
 function loadSel(){const nm=$('s_name').value.trim(),r=(ld()[nm]||[]).filter(x=>x.in&&x.in.kind==='sel').slice(-1)[0];if(!r){alert('لا يوجد اختبار انتقاء محفوظ بهذا الاسم');return}
 SEL_F.forEach(k=>$('s_'+k).value=r.in[k]==null?'':r.in[k]);(r.in.r||[]).forEach((x,i)=>$('s_r'+(i+1)).value=x==null?'':x);$('s_sx').value=r.in.sx||'m';if(okR(r)){showSel(r,nm);selHist(nm)}}
 function selAuto(){const n=cfg().player,r=(ld()[n]||[]).filter(x=>x.in&&x.in.kind==='sel'&&okR(x)).slice(-1)[0];if(r){showSel(r,n);selHist(n)}}
@@ -416,9 +374,9 @@ h+='<tr><td></td><td><b>الانحراف المعياري</b></td>'+GR.map(g=>{c
 h+='<tr><td></td><td><b>الأفضل في الاختبار</b></td>'+GR.map(g=>{let b=null;L.forEach(x=>{const v=x.r.m.g[g[0]];if(v!=null&&(b==null||v>b.v))b={n:x.n,v}});return `<td>${b?E(b.n):'—'}</td>`}).join('')+'<td></td><td></td><td></td></tr></table>';
 $('cmp_out').innerHTML=h}
 function initSel(){$('s_date').value=new Date().toISOString().slice(0,10);dlUpd()}
-addEventListener('online',()=>sync());addEventListener('load',()=>setTimeout(sync,1500));
-addEventListener('DOMContentLoaded',()=>{plist();chart();initSel();applyRole();st(!CLOUD_URL?'لم تُضبط قاعدة البيانات السحابية بعد (انظر ملف README)':cfg().email?'مسجل الدخول: '+(cfg().role==='player'?'لاعب — '+cfg().player:cfg().email):'غير مسجل الدخول، البيانات محفوظة على هذا الجهاز فقط')});
+
+addEventListener('DOMContentLoaded',()=>{if(sessionStorage.getItem('theFasterAdminSession')==='1'){$('loginGate').style.display='none';$('appShell').style.display='block';plist();chart();initSel();applyRole();updateDashboard()}else{$('loginGate').style.display='block';$('appShell').style.display='none';$('adminAccessButton').textContent=localStorage.getItem('theFasterAdminHash')?'دخول لوحة التحكم':'إنشاء كلمة مرور المسؤول وبدء الاستخدام'}});
 if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
 function cp(){try{navigator.clipboard.writeText(SUM).then(()=>$('cm').textContent=' تم النسخ')}catch(e){$('cm').textContent=' تعذر النسخ، حدد النص يدويًا'}}
 </script>
-</body></html>
+</div></div></body></html>
