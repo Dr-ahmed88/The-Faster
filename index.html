@@ -8,7 +8,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#0b6e4f">
 <script>
-// إعدادات قاعدة البيانات السحابية (Supabase): ضع هنا رابط المشروع ومفتاح anon العام فقط. لا تضع مفتاح service_role أبدًا.
+// وضع محلي: لا توجد مزامنة سحابية. تُحفظ البيانات في المتصفح وتُصدّر يدويًا إلى Excel.
 // Local-only mode: no cloud sync. Data stays in this browser and can be exported to Excel.
 </script>
 <link rel="icon" href="icon-192.png">
@@ -272,7 +272,7 @@ async function adminAccess(){const p=$('adminPassword').value,saved=localStorage
 function applyRole(){document.querySelectorAll('.adm').forEach(e=>e.style.display='');document.querySelectorAll('.admo').forEach(e=>e.style.display='none');updateDashboard()}
 function logout(){sessionStorage.removeItem('theFasterAdminSession');$('appShell').style.display='none';$('loginGate').style.display='block';$('loginStatus').textContent='تم تسجيل الخروج. البيانات المحفوظة لم تُحذف.'}
 function sync(){st('المزامنة السحابية معطّلة. استخدم تنزيل ملف Excel أو النسخة الاحتياطية JSON.')}
-function updateDashboard(){const el=$('dashboardKpis');if(!el)return;const o=ld(),names=Object.keys(o).filter(n=>n.slice(0,2)!=='__'),records=names.flatMap(n=>(o[n]||[])),sel=records.filter(x=>x.in&&x.in.kind==='sel');el.innerHTML='<div class="kp"><b>'+names.length+'</b><span>لاعبون مسجلون</span></div><div class="kp"><b>'+records.length+'</b><span>اختبارات محفوظة</span></div><div class="kp"><b>'+sel.length+'</b><span>اختبارات انتقاء</span></div><div class="kp"><b>'+new Set(records.map(x=>x.date).filter(Boolean)).size+'</b><span>أيام اختبار مسجلة</span></div>}
+function updateDashboard(){const el=$('dashboardKpis');if(!el)return;const o=ld(),names=Object.keys(o).filter(n=>n.slice(0,2)!=='__'),records=names.flatMap(n=>(o[n]||[])),sel=records.filter(x=>x.in&&x.in.kind==='sel');el.innerHTML='<div class="kp"><b>'+names.length+'</b><span>لاعبون مسجلون</span></div><div class="kp"><b>'+records.length+'</b><span>اختبارات محفوظة</span></div><div class="kp"><b>'+sel.length+'</b><span>اختبارات انتقاء</span></div><div class="kp"><b>'+new Set(records.map(x=>x.date).filter(Boolean)).size+'</b><span>أيام اختبار مسجلة</span></div>'}
 function exportExcel(){
 const o=ld(),names=Object.keys(o).filter(n=>n.slice(0,2)!=='__'),records=names.flatMap(n=>(o[n]||[]).map(x=>({name:n,...x})));
 const esc=v=>String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;');
