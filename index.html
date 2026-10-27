@@ -94,30 +94,7 @@ h3{font-size:.95rem;margin:12px 0 4px}
 <div class="card adm"><h2>مقارنة نتائج اختبارات اللاعبين</h2>
 <p class="n">تُقارن آخر اختبارات انتقاء محفوظة لكل لاعب، وتُرتَّب بمتوسط درجات الاختبارات الست.</p>
 <button onclick="cmpAll()">تحديث المقارنة</button><div id="cmp_out" class="t" style="margin-top:8px"></div></div>
-<div class="card adm"><h2>لوحة التحكم الرقمية العامة</h2><div class="k" id="dashboardKpis"><div class="kp"><b>0</b><span>لاعبون</span></div><div class="kp"><b>0</b><span>اختبارات</span></div></div><p class="n">المؤشرات من البيانات المحفوظة محليًا. يمكن تصدير ملخص اللاعبين وسجل الاختبارات إلى Excel.</p><button onclick="exportExcel()">تنزيل لوحة البيانات بصيغة Excel</button></div><div class="card adm"><h2>المعطيات</h2>
-<div class="g">
-<label>الطول (سم)<input id="h" type="number"></label>
-<label>الوزن (كجم)<input id="w" type="number"></label>
-<label>العمر الزمني (سنة)<input id="a" type="number"></label>
-<label>العمر التدريبي (سنة)<input id="ta" type="number"></label>
-<label>النوع<select id="sx"><option value="m">ذكر</option><option value="f">أنثى</option></select></label>
-<label>زمن 30م تسارع (ث)<input id="t30" type="number" step="0.01"></label>
-<label>زمن 50م بدء طائر (ث)<input id="t50" type="number" step="0.01"></label>
-<label>الرقم الشخصي في آخر بطولة 100م (ث)<input id="pb" type="number" step="0.01"></label>
-<label>الرقم القياسي المصري 100م (ث)<input id="rec" type="number" step="0.01"></label>
-<label>أيام التدريب الأسبوعية<select id="d"><option>3</option><option>4</option><option selected>5</option><option>6</option></select></label>
-<label>نبض الراحة (ن/د)<input id="hr" type="number"></label>
-<label>الوثب العريض من الثبات (م)<input id="slj" type="number" step="0.01"></label>
-<label>3 حجلات رجل يمنى (م)<input id="hr3" type="number" step="0.01"></label>
-<label>3 حجلات رجل يسرى (م)<input id="hl3" type="number" step="0.01"></label>
-<label>قوة عضلات الرجلين (كجم)<input id="ls" type="number"></label>
-<label>عدد أسابيع الموسم<input id="wk" type="number" value="40"></label>
-</div>
-<button onclick="run()">احسب وضع الخطة</button>
-<button class="s" onclick="demo()">بيانات تجريبية</button>
-</div>
-
-<div id="out" class="adm">
+<div class="card adm"><h2>لوحة التحكم الرقمية العامة</h2><div class="k" id="dashboardKpis"><div class="kp"><b>0</b><span>لاعبون</span></div><div class="kp"><b>0</b><span>اختبارات</span></div></div><p class="n">المؤشرات من البيانات المحفوظة محليًا. يمكن تصدير ملخص اللاعبين وسجل الاختبارات إلى Excel.</p><button onclick="exportExcel()">تنزيل لوحة البيانات بصيغة Excel</button></div><div id="out" class="adm">
 <div class="card"><h2>المؤشرات الميكانيكية المقدّرة</h2><div class="k" id="kp"></div>
 <p class="n" id="kn"></p></div>
 <div class="card"><h2>التشخيص</h2><div id="dg"></div></div>
