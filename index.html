@@ -85,6 +85,8 @@ h3{font-size:.95rem;margin:12px 0 4px}
 <button onclick="analyzeSel()">تحليل الانتقاء</button>
 <button onclick="saveSel()">حفظ في سجل اللاعب</button>
 <button class="s" onclick="loadSel()">تحميل آخر اختبار للاعب</button>
+<button type="button" class="s" onclick="fillRandomSel()">🎲 ملء بيانات عشوائية</button>
+<button type="button" style="background:#b42318" onclick="clearSelForm()">🗑️ حذف البيانات</button>
 <details style="margin-top:10px"><summary>طريقة تنفيذ الاختبارات والمراجع</summary>
 <ul class="n"><li>كوبر: أكبر مسافة جري في 12 دقيقة. VO2max التقديري = (المسافة − 504.9) ÷ 44.73.</li>
 <li>RAST: 6 تكرارات × 35م بأقصى سرعة بينها راحة 10 ث. القدرة = الوزن × 35² ÷ الزمن³، ومؤشر التعب = (أعلى قدرة − أدنى قدرة) ÷ مجموع الأزمنة.</li>
@@ -293,6 +295,33 @@ const EV={s60:{n:'60م عدو داخلي',group:'s100',w:{acc:.25,vmax:.3,pw:.2,
 const GR=[['ae','القدرة الهوائية',['aer']],['an','القدرة اللاهوائية',['anp','anm','fat']],['sp','السرعة القصوى',['acc','vmax']],['mu','القدرة العضلية',['pw']],['fx','المرونة',['flx']],['bl','التوازن الديناميكي',['bass']]];
 const num=id=>{const x=parseFloat($(id).value);return isFinite(x)?x:null};
 function addSkillTestRow(eventValue='',scoreValue=''){const box=$('skillExtraRows'),row=document.createElement('div');row.className='g skill-extra-row';const opts=$('s_skillEvent').innerHTML;row.innerHTML='<label>المسابقة الإضافية<select class="skill-event-extra">'+opts+'</select></label><label>درجة الإتقان الفني (1–5)<input class="skill-score-extra" type="number" min="1" max="5" step="1"></label><button type="button" class="s" onclick="this.parentElement.remove()">حذف التقييم</button>';row.querySelector('select').value=eventValue||$('s_skillEvent').value;row.querySelector('input').value=scoreValue;box.appendChild(row)}
+
+function clearSelForm(){
+ if(!confirm('هل تريد مسح البيانات الموجودة حاليًا في نموذج اختبارات الانتقاء؟ لن يتم حذف الاختبارات المحفوظة في سجل اللاعب.'))return;
+ ['s_name','s_date','s_age','s_ta','s_h','s_w','s_span','s_shoulder','s_cooper','s_t30','s_t50f','s_slj','s_vj','s_mb','s_sr','s_bass','s_hr','s_vc','s_recovery','s_circles','s_skill'].forEach(id=>{if($(id))$(id).value=''});
+ [1,2,3,4,5,6].forEach(i=>{if($('s_r'+i))$('s_r'+i).value=''});
+ $('s_sx').value='m';$('s_status').value='normal';$('s_skillEvent').value='s100';$('skillExtraRows').innerHTML='';
+ EDIT_RID=null;EDIT_NAME=null;
+ const btn=document.querySelector('button[onclick="saveSel()"]');if(btn)btn.textContent='حفظ في سجل اللاعب';
+ $('sel_res').innerHTML='';$('sel_plan').innerHTML='';$('sel_h').innerHTML='';
+}
+function fillRandomSel(){
+ const rnd=(a,b,d=1)=>{const v=a+Math.random()*(b-a);return d===0?Math.round(v):Number(v.toFixed(d))};
+ $('s_name').value='لاعب تجريبي';$('s_date').value=new Date().toISOString().slice(0,10);
+ $('s_sx').value=Math.random()<.5?'m':'f';$('s_age').value=rnd(12,25,1);$('s_ta').value=rnd(0.5,8,1);$('s_status').value='normal';
+ $('s_h').value=rnd(145,195,1);$('s_w').value=rnd(42,95,1);$('s_span').value=rnd(145,200,1);$('s_shoulder').value=rnd(34,52,1);
+ $('s_cooper').value=rnd(1800,3200,0);
+ [1,2,3,4,5,6].forEach(i=>{if($('s_r'+i))$('s_r'+i).value=rnd(4.4,6.5,2)});
+ $('s_t30').value=rnd(4.1,5.8,2);$('s_t50f').value=rnd(5.2,7.2,2);
+ $('s_slj').value=rnd(1.5,2.8,2);$('s_vj').value=rnd(20,65,0);$('s_mb').value=rnd(3,12,1);
+ $('s_sr').value=rnd(-5,25,1);$('s_circles').value=rnd(12,28,2);$('s_bass').value=rnd(55,98,0);
+ $('s_hr').value=rnd(55,95,0);$('s_vc').value=rnd(2.2,6.0,1);$('s_recovery').value=rnd(65,145,0);
+ $('s_skillEvent').value='s100';$('s_skill').value=rnd(2,5,0);$('skillExtraRows').innerHTML='';
+ EDIT_RID=null;EDIT_NAME=null;
+ const btn=document.querySelector('button[onclick="saveSel()"]');if(btn)btn.textContent='حفظ في سجل اللاعب';
+ alert('تم ملء النموذج ببيانات عشوائية تجريبية للتجربة فقط. راجعها ولا تحفظها كسجل حقيقي قبل استبدالها بالقياسات الفعلية.');
+}
+
 function readSel(){const o={kind:'sel',sx:$('s_sx').value,status:$('s_status').value,skillEvent:$('s_skillEvent').value};SEL_F.forEach(k=>o[k]=num('s_'+k));o.skill=num('s_skill');o.r=[1,2,3,4,5,6].map(i=>num('s_r'+i));o.skillTests=[];if(o.skill!=null&&o.skill>=1&&o.skill<=5)o.skillTests.push({event:o.skillEvent,score:o.skill});document.querySelectorAll('.skill-extra-row').forEach(row=>{const event=row.querySelector('select').value,score=parseFloat(row.querySelector('input').value);if(Number.isFinite(score)&&score>=1&&score<=5)o.skillTests.push({event,score})});return o}
 function calc(o){const sx=o.sx,Q={},X={},sc=(k,v)=>{const ref=NORMATIVE_REFERENCES[k];if(!ref||!Number.isFinite(Number(o.age))||!Number.isFinite(Number(v)))return null;return null},A=a=>{a=a.filter(x=>x!=null);return a.length?a.reduce((x,y)=>x+y,0)/a.length:null};
 if(o.cooper>0){X.vo2=(o.cooper-504.9)/44.73;Q.aer=sc('coop',o.cooper)}
