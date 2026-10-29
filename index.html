@@ -522,7 +522,14 @@ $('cmp_out').innerHTML=h}
 function initSel(){$('s_date').value=new Date().toISOString().slice(0,10);dlUpd()}
 
 addEventListener('DOMContentLoaded',()=>{if(sessionStorage.getItem('theFasterAdminSession')==='1'){$('loginGate').style.display='none';$('appShell').style.display='block';plist();chart();initSel();applyRole();updateDashboard()}else if(sessionStorage.getItem('theFasterPlayerSession')){const user=sessionStorage.getItem('theFasterPlayerSession');$('loginGate').style.display='none';$('appShell').style.display='block';applyRole();renderPlayerPortal(user)}else{$('loginGate').style.display='block';$('appShell').style.display='none';$('adminAccessButton').textContent=localStorage.getItem('theFasterAdminHash')?'دخول لوحة التحكم':'إنشاء كلمة مرور المسؤول وبدء الاستخدام'}});
-if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+// تحديث عامل الخدمة لتفادي الاحتفاظ بصفحة 404 قديمة في الذاكرة المؤقتة
+if ('serviceWorker' in navigator) {
+  addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' })
+      .then(registration => registration.update())
+      .catch(() => {});
+  });
+}
 function cp(){try{navigator.clipboard.writeText(SUM).then(()=>$('cm').textContent=' تم النسخ')}catch(e){$('cm').textContent=' تعذر النسخ، حدد النص يدويًا'}}
 </script>
 </div></div></body></html>
